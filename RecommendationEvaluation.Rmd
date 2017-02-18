@@ -1,0 +1,120 @@
+---
+title: "Оценка качества рекомендаций"
+output: html_document
+---
+
+
+Сегодня мы обсудим оценку качества рекомендательной системы в R, которую мы стоили в прошлый раз.
+
+Используем пакет `recommenderlab` и оставляем только фильмы/пользователей с достаточным числом оценок.
+
+```{r message=FALSE, warning=FALSE}
+library(recommenderlab)
+data(MovieLense)
+ratings_movies <- MovieLense[rowCounts(MovieLense) > 50,
+colCounts(MovieLense) > 100] 
+```
+
+Обычно мы делили на тестовую и обучающую выборки сами. Пакет `recommenderlab` предлагает нам "схемы", которые сделают тоже самое.
+
+```{r}
+percentage_training <- 0.8
+items_to_keep <- 15
+rating_threshold <- 3
+n_eval <-1
+  
+set.seed(100)
+eval_sets <- evaluationScheme(data = ratings_movies, method = "split",
+train = percentage_training, given = items_to_keep, goodRating = rating_threshold, k = n_eval) 
+
+eval_sets
+
+```
+Можем посмотреть как устроена наша обучающая выборка.
+
+```{r}
+getData(eval_sets, "train")
+```
+
+Можно посмотреть сколько оценок мы спрятали от нашей рекомендательной системы.
+
+```{r}
+library(ggplot2)
+qplot(rowCounts(getData(eval_sets, "unknown"))) + geom_histogram(binwidth = 1) + ggtitle("unknown items by the users")
+```
+
+
+```{r}
+model_to_evaluate <- "IBCF"
+model_parameters <- NULL
+
+eval_recommender <- Recommender(data = getData(eval_sets, "train"),
+method = model_to_evaluate, parameter = model_parameters)
+```
+
+```{r}
+items_to_recommend <- 20
+eval_prediction <- predict(object = eval_recommender, newdata =
+getData(eval_sets, "known"), n = items_to_recommend, type = "ratings")
+```
+
+
+Мы сделали предсказание, давайте посмотрм на его качество.
+
+```{r}
+eval_accuracy <- calcPredictionAccuracy(
+ x = eval_prediction, data = getData(eval_sets, "unknown"), byUser =
+TRUE)
+head(eval_accuracy)
+```
+
+```{r}
+eval_accuracy <- calcPredictionAccuracy(
+ x = eval_prediction, data = getData(eval_sets, "unknown"), byUser =
+FALSE)
+eval_accuracy
+```
+
+Мы получили какие-то оценки. Хорошие они или плохие?
+
+Мы можем сравнивать таким образом модели.
+
+Посмотрим на еще один способ. Мы выше определили понятие "хороший" фильм введя трешхолд по оценке. Давайте смотреть на "долю" хороших фильмов, среди наших рекомендаций.  
+
+```{r}
+results <- evaluate(x = eval_sets, method = model_to_evaluate, n =c(1, seq(10, 100, 10)))
+head(getConfusionMatrix(results)[[1]])
+```
+
+
+```{r}
+models_to_evaluate <- list(
+ IBCF_cos = list(name = "IBCF", param = list(method = "cosine")),
+ IBCF_cor = list(name = "IBCF", param = list(method =  "pearson")),
+ UBCF_cos = list(name = "UBCF", param = list(method = "cosine")),
+ UBCF_cor = list(name = "UBCF", param = list(method = "pearson")),
+ random = list(name = "RANDOM", param=NULL), 
+ popular = list(name = "POPULAR", param=NULL),
+ svd = list(name = "SVD", param=NULL)
+)
+```
+
+
+
+```{r}
+n_recommendations <- c(1, 5, seq(10, 200, 10))
+list_results <- evaluate(x = eval_sets, method = models_to_evaluate, n
+= n_recommendations)
+```
+
+```{r}
+plot(list_results, annotate = 1, legend = "topleft") 
+```
+
+
+
+**Ваша очередь:**
+
+Попробуйте разные параметры моделей и разные настройки тренировочного/проверочного датасета.
+
+Попробуйте k-fold кроссвалидацию. Изменились ли результаты?
