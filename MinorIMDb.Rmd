@@ -37,7 +37,42 @@ install.packages("readxl")
 library(readxl)
 k=read_excel("~/Ilja/minor_project/test.excelfile.xlsx", sheet = 1)
 
-#склеить базу imdb1000 imdb2000 imdb3000 в imdb
-#в imdb добавить год фильма и рейтинг из imdbmeta
-#в imdb добавить страну
+
+
+
+
+#цикл для добавления локаций
+library(gdata)
+library(rvest)
+library(XML)
+library(stringr)
+library(pander)
+
+#создаем df
+film_df = data.frame(FilmID=character(),
+                     FilmName=character(), 
+                     Location=character(), 
+                     stringsAsFactors=FALSE)
+
+head(film_df)
+
+colClasses = c("character", "character", "character")
+col.names = c("FilmId", "FilmName", "Location")
+
+film_df <- read.table(text = "test test test",
+                      colClasses = colClasses,
+                      col.names = col.names)
+
+for (i in 1:250) {
+page <- read_html(as.character(imdbmeta[i, 5]))
+all_list<-page %>% html_nodes(xpath = '//*[@id="filming_locations_content"]')
+listings <- xml_nodes(all_list,xpath = '//dt')
+loc_list <-listings %>% xml_text() %>% str_trim()
+
+for (Location in loc_list) {
+  FilmId = as.character(imdbmeta[i, 4])
+  FilmName = as.character(imdbmeta[i, 2])
+  film_df <- rbind(film_df, c(FilmId, FilmName, Location))
+}
+}
 ```
