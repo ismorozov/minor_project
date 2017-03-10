@@ -1,0 +1,78 @@
+---
+title: "IMDb recommendation"
+author: "Ilya Morozov"
+date: "04 03 2017"
+output: html_document
+---
+
+```{r}
+#imdb1000<-data.frame(film_df[1:1000,], geocodes[2])
+#imdb1000<-data.frame(imdb1000, geocodes[1])
+#imdb1000<-imdb1000[2:1000,]
+#imdbmeta<-imdbfull
+
+#save(imdb1000,file="imdb1000.Rda")
+#save(imdbmeta,file="imdbmeta.Rda")
+#save(imdb1000,file="imdb1000.txt")
+#save(imdbmeta,file="imdbmeta.txt")
+#save(film_df,file="film_df.txt")
+#save(film_df,file="film_df.txt")
+
+
+library(ggmap)
+#geocodes2 <- geocode(as.character(film_df$Location[1001:2000]))
+#imdb2000<-data.frame(film_df[1001:2000,], geocodes2[2], geocodes2[1])
+#save(imdb2000,file="imdb2000.txt")
+#save(imdb2000,file="imdb2000.Rda")
+
+#geocodes3 <- geocode(as.character(film_df$Location[2001:3093]))
+geocode2.5<-geocodes3[1:479,]
+#imdb3000<-data.frame(film_df[2001:3093,], geocodes3[2], geocodes3[1])
+#save(imdb3000,file="imdb3000.txt")
+#save(imdb3000,file="imdb3000.Rda")
+
+
+
+install.packages("readxl")
+library(readxl)
+k=read_excel("~/Ilja/minor_project/test.excelfile.xlsx", sheet = 1)
+
+
+
+
+
+#цикл для добавления локаций
+library(gdata)
+library(rvest)
+library(XML)
+library(stringr)
+library(pander)
+
+#создаем df
+film_df = data.frame(FilmID=character(),
+                     FilmName=character(), 
+                     Location=character(), 
+                     stringsAsFactors=FALSE)
+
+head(film_df)
+
+colClasses = c("character", "character", "character")
+col.names = c("FilmId", "FilmName", "Location")
+
+film_df <- read.table(text = "test test test",
+                      colClasses = colClasses,
+                      col.names = col.names)
+
+for (i in 1:250) {
+page <- read_html(as.character(imdbmeta[i, 5]))
+all_list<-page %>% html_nodes(xpath = '//*[@id="filming_locations_content"]')
+listings <- xml_nodes(all_list,xpath = '//dt')
+loc_list <-listings %>% xml_text() %>% str_trim()
+
+for (Location in loc_list) {
+  FilmId = as.character(imdbmeta[i, 4])
+  FilmName = as.character(imdbmeta[i, 2])
+  film_df <- rbind(film_df, c(FilmId, FilmName, Location))
+}
+}
+```
