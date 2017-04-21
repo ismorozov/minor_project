@@ -1,0 +1,42 @@
+---
+title: "base"
+output: html_document
+---
+
+```{r}
+library(readr)
+library(dplyr)
+film_df <- read_csv("~/minor_project2/film_df.csv")
+```
+
+```{r}
+#strsplit(film_df$Location, ",(?=[^,]+$)", perl=TRUE)
+
+#Сделать столбец со странами
+library(stringr)
+film_df$country <- str_extract(film_df$Location, '\\b[^,]+$')
+```
+
+```{r}
+#Добавили названия фильмов, которые кликнет пользователь
+a <- "Wild Tales (2014)"
+b <- "White Elephant (2012)"
+c <- "Kiss of the Spider Woman (1985)"
+
+a <- as.character(a)
+b <- as.character(b)
+c <- as.character(c)
+
+# оставляем те строки, которые сделаны для этих фильмов
+new_df <- dplyr::filter(film_df, OriginFilm == a | OriginFilm == b | OriginFilm == c)
+
+# считаем число упоминаний стран и выбираем самую часто встречающуюся страну
+new_df2 <- count(group_by(new_df, country))
+#new_df3 <- new_df2[which.max(new_df2$n),]
+#z <- new_df3$country
+z <- new_df2$country[new_df2$n==max(new_df2$n)]
+
+# новый дф, где только эта страна, можно показывать пользователю
+new_df3 <- filter(new_df, country == z)
+```
+
