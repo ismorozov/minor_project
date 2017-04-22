@@ -15,6 +15,9 @@ film_df <- read_csv("~/minor_project2/film_df.csv")
 #Сделать столбец со странами
 library(stringr)
 film_df$country <- str_extract(film_df$Location, '\\b[^,]+$')
+
+# убирает последние 7 символов ( - IMDB)
+film_df$FilmName <- gsub('.{7}$', '', film_df$FilmName)
 ```
 
 ```{r}
@@ -40,3 +43,8 @@ z <- new_df2$country[new_df2$n==max(new_df2$n)]
 new_df3 <- filter(new_df, country == z)
 ```
 
+```{r}
+# создать список фильмов и удалить дубликаты
+names <- select (film_df, FilmName)
+names1 <- names[!duplicated(names), ]
+```
