@@ -9,22 +9,37 @@
 
 library(shiny)
 
-# Define UI for application that draws a histogram
-shinyUI(fluidPage(
+# Load the ggplot2 package which provides
+# the 'mpg' dataset.
+library(ggplot2)
+
+fluidPage(
+  titlePanel("Basic DataTable"),
   
-  # Application title
-  titlePanel("Find your perfect place fo go"),
-  
-  selectInput("select", label = h3("Select film"), 
-              choices = list(names1), 
-              selected = 1),
-  
-  hr(),
-  fluidRow(column(3, verbatimTextOutput("value"))),
-    
-    # Show a plot of the generated distribution
-    mainPanel(
-       plotOutput("distPlot")
+  # Create a new Row in the UI for selectInputs
+  fluidRow(
+    column(4,
+           selectInput("f1",
+                       "Film 1:",
+                       c("All",
+                         unique(as.character(film_df$FilmName))))
+    ) ,
+    column(4,
+           selectInput("f2",
+                       "Film 2:",
+                       c("All",
+                         unique(as.character(film_df$FilmName))))
+    ),
+    column(4,
+           selectInput("f3",
+                       "Film 3:",
+                       c("All",
+                         unique(as.character(film_df$FilmName))))
     )
+  ),
+  # Create a new row for the table.
+  fluidRow(
+    DT::dataTableOutput("table")
   )
 )
+
