@@ -20,9 +20,6 @@ film_df <- read_csv("~/minor_project2/film_df.csv")
 library(stringr)
 film_df$country <- str_extract(film_df$Location, '\\b[^,]+$')
 
-names <- select (film_df, FilmName)
-names1 <- names[!duplicated(names), ]
-
 function(input, output) {
   
   # Filter data based on selections
