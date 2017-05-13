@@ -20,21 +20,15 @@ fluidPage(
   fluidRow(
     column(4,
            selectInput("f1",
-                       "Film 1:",
+                       "Film:",
                        c("All",
-                         unique(as.character(film_df$FilmName))))
+                         unique(film_df$FilmName)))
     ) ,
     column(4,
            selectInput("f2",
-                       "Film 2:",
+                       "Location:",
                        c("All",
-                         unique(as.character(film_df$FilmName))))
-    ),
-    column(4,
-           selectInput("f3",
-                       "Film 3:",
-                       c("All",
-                         unique(as.character(film_df$FilmName))))
+                         unique(film_df$Location)))
     )
   ),
   # Create a new row for the table.

@@ -27,13 +27,11 @@ function(input, output) {
     data <- film_df
     if (input$f1 != "All") {
       data <- data[data$FilmName == input$f1,]
-    } |
+    } 
       if (input$f2 != "All") {
-        data <- data[data$FilmName == input$f2,]
-      } |
-      if (input$f3 != "All") {
-        data <- data[data$FilmName == input$f3,]
-      }
+        data <- data[data$Location == input$f2,]
+      } 
+    
     data
   }))
   
