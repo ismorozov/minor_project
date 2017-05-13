@@ -9,21 +9,32 @@
 
 library(shiny)
 
+# Load the ggplot2 package which provides
+# the 'mpg' dataset.
+library(ggplot2)
+
 library(readr)
 library(dplyr)
-film_df <- read_csv("~/minor_project2/film_df.csv") # потом будет другой путь! (из общей папки)
+film_df <- read_csv("~/minor_project2/film_df.csv")
 
-#Сделать столбец со странами
 library(stringr)
 film_df$country <- str_extract(film_df$Location, '\\b[^,]+$')
 
-# список названий фильмов
-names <- select (film_df, FilmName)
-names1 <- names[!duplicated(names), ]
-
 function(input, output) {
   
-  # You can access the value of the widget with input$select, e.g.
-  output$value <- renderPrint({ input$select })
+  # Filter data based on selections
+  output$table <- DT::renderDataTable(DT::datatable({
+    data <- film_df
+    if (input$f1 != "All") {
+      data <- data[data$FilmName == input$f1,]
+    } |
+      if (input$f2 != "All") {
+        data <- data[data$FilmName == input$f2,]
+      } |
+      if (input$f3 != "All") {
+        data <- data[data$FilmName == input$f3,]
+      }
+    data
+  }))
   
 }
