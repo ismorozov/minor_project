@@ -20,11 +20,13 @@ film_df <- read_csv("~/minor_project2/film_df.csv")
 library(stringr)
 film_df$country <- str_extract(film_df$Location, '\\b[^,]+$')
 
+film_df2 <- film_df %>% select(FilmName, Location)
+
 function(input, output) {
   
   # Filter data based on selections
   output$table <- DT::renderDataTable(DT::datatable({
-    data <- film_df
+    data <- film_df2 
     if (input$f1 != "All") {
       data <- data[data$FilmName == input$f1,]
     } 
@@ -32,7 +34,10 @@ function(input, output) {
         data <- data[data$Location == input$f2,]
       } 
     
-    data
+    d1 <- film_df %>% filter(FilmName == input$f1) # делает (сохраняет) таблицу с одним фильмом и его локациями
+    
+    data #выдает пользователю таблицу только с фильмами и локациями (чтобы было проще смотреть)
   }))
+
   
 }
