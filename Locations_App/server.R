@@ -36,6 +36,9 @@ function(input, output, session) {
     } 
     
     d1 <- film_df %>% filter(FilmName == input$f1) # делает таблицу с одним фильмом и его локациями
+    d2 <- d1 %>% filter(Location == input$f2)
+    lon <- d2$lon 
+    lat <- d2$lat
     
     data #выдает пользователю таблицу только с фильмами и локациями (чтобы было проще смотреть)
     
