@@ -14,6 +14,7 @@ library(shiny)
 library(ggplot2)
 
 fluidPage(
+  leafletOutput("mymap"),
   titlePanel("Basic DataTable"),
   
   # Create a new Row in the UI for selectInputs
